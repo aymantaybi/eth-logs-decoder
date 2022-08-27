@@ -23,10 +23,13 @@ function decodeLog(
     topics,
     inputs.filter((input) => input.indexed)
   );
-  let decodedData = decodeInputs(
-    data,
-    inputs.filter((input) => !input.indexed)
-  );
+  let decodedData =
+    data != "0x"
+      ? decodeInputs(
+          data,
+          inputs.filter((input) => !input.indexed)
+        )
+      : {};
   return {
     address: log.address,
     event: {
