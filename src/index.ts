@@ -65,7 +65,7 @@ function decodeInputs(hexString: string, inputs: AbiInput[]) {
 function formatDecoded(element: {
   [key: string]: any;
 }): Array<string | object> | { [key: string]: string | object } {
-  if (typeof element != "object") return element;
+  if (element == null || typeof element != "object") return element;
   let objectKeys = Object.keys(element);
   if (Array.isArray(element) && objectKeys.every((key: any) => !isNaN(key)))
     return element.map((value: any) => formatDecoded(value));
