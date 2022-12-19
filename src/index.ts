@@ -1,6 +1,7 @@
 import ABICoder from "web3-eth-abi";
 import { Log } from "web3-core";
 import { AbiItem, AbiInput } from "web3-utils";
+import { fromObject } from "./utils";
 
 export function decodeLog(
   log: Log,
@@ -16,27 +17,27 @@ export function decodeLog(
   let { topics, data } = log;
   let eventJsonInterface = jsonInterface.find((item) => ABICoder.encodeEventSignature(item) == topics[0]);
   if (!eventJsonInterface) throw new Error("Cannot find Event ABI item");
-  let inputs = eventJsonInterface.inputs || [];
+  let eventJsonInterfaceInputs = eventJsonInterface.inputs || [];
   let decodedTopics = decodeTopics(
     topics,
-    inputs.filter((input) => input.indexed)
+    eventJsonInterfaceInputs.filter((input) => input.indexed)
   );
   let decodedData =
     data != "0x"
       ? decodeInputs(
           data,
-          inputs.filter((input) => !input.indexed)
+          eventJsonInterfaceInputs.filter((input) => !input.indexed)
         )
       : {};
+
+  const inputs = { ...decodedTopics, ...fromObject(decodedData) };
+
   return {
     address: log.address,
     event: {
       signature: topics[0],
       name: eventJsonInterface.name,
-      inputs: {
-        ...decodedTopics,
-        ...(decodedData || {}),
-      },
+      inputs,
     },
   };
 }
