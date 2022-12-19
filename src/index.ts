@@ -35,7 +35,7 @@ export function decodeLog(
       name: eventJsonInterface.name,
       inputs: {
         ...decodedTopics,
-        ...decodedData,
+        ...(decodedData || {}),
       },
     },
   };
@@ -57,7 +57,8 @@ export function decodeInputs(hexString: string, inputs: AbiInput[]) {
   return formatDecoded(decoded);
 }
 
-export function formatDecoded(element: { [key: string]: any }): Array<string | object> | { [key: string]: string | object } {
+export function formatDecoded(element: { [key: string]: any }): unknown {
+  if (!isNaN(element as any)) return Number(element);
   if (element == null || typeof element != "object") return element;
   let objectKeys = Object.keys(element);
   if (Array.isArray(element) && objectKeys.every((key: any) => !isNaN(key))) return element.map((value: any) => formatDecoded(value));
