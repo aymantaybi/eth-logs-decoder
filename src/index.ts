@@ -2,7 +2,7 @@ import ABICoder from "web3-eth-abi";
 import { Log } from "web3-core";
 import { AbiItem, AbiInput } from "web3-utils";
 
-function decodeLog(
+export function decodeLog(
   log: Log,
   jsonInterface: AbiItem[]
 ): {
@@ -14,9 +14,7 @@ function decodeLog(
   };
 } {
   let { topics, data } = log;
-  let eventJsonInterface = jsonInterface.find(
-    (item) => ABICoder.encodeEventSignature(item) == topics[0]
-  );
+  let eventJsonInterface = jsonInterface.find((item) => ABICoder.encodeEventSignature(item) == topics[0]);
   if (!eventJsonInterface) throw new Error("Cannot find Event ABI item");
   let inputs = eventJsonInterface.inputs || [];
   let decodedTopics = decodeTopics(
@@ -43,10 +41,7 @@ function decodeLog(
   };
 }
 
-function decodeTopics(
-  topics: string[],
-  inputs: AbiInput[]
-): { [key: string]: string } {
+export function decodeTopics(topics: string[], inputs: AbiInput[]): { [key: string]: string } {
   let decoded: { [key: string]: any } = {};
 
   for (let i = 1; i < topics.length; i++) {
@@ -57,18 +52,15 @@ function decodeTopics(
   return decoded;
 }
 
-function decodeInputs(hexString: string, inputs: AbiInput[]) {
+export function decodeInputs(hexString: string, inputs: AbiInput[]) {
   let decoded = ABICoder.decodeParameters(inputs, hexString);
   return formatDecoded(decoded);
 }
 
-function formatDecoded(element: {
-  [key: string]: any;
-}): Array<string | object> | { [key: string]: string | object } {
+export function formatDecoded(element: { [key: string]: any }): Array<string | object> | { [key: string]: string | object } {
   if (element == null || typeof element != "object") return element;
   let objectKeys = Object.keys(element);
-  if (Array.isArray(element) && objectKeys.every((key: any) => !isNaN(key)))
-    return element.map((value: any) => formatDecoded(value));
+  if (Array.isArray(element) && objectKeys.every((key: any) => !isNaN(key))) return element.map((value: any) => formatDecoded(value));
   let formatted: { [key: string]: any } = {};
   objectKeys
     .filter((key: any) => isNaN(key) && key != "__length__")
@@ -77,5 +69,3 @@ function formatDecoded(element: {
     });
   return formatted;
 }
-
-export { decodeLog, decodeInputs };
