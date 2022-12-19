@@ -59,7 +59,7 @@ export function decodeInputs(hexString: string, inputs: AbiInput[]) {
 }
 
 export function formatDecoded(element: { [key: string]: any }): unknown {
-  if (!isNaN(element as any)) return Number(element);
+  //if (!isNaN(element as any)) return Number(element);
   if (element == null || typeof element != "object") return element;
   let objectKeys = Object.keys(element);
   if (Array.isArray(element) && objectKeys.every((key: any) => !isNaN(key))) return element.map((value: any) => formatDecoded(value));
