@@ -2,6 +2,7 @@ import ABICoder from "web3-eth-abi";
 import { Log } from "web3-core";
 import { AbiItem, AbiInput } from "web3-utils";
 import { fromObject } from "./utils";
+import { formatDecodedParameters } from "./helpers";
 
 export function decodeLog(
   log: Log,
@@ -54,20 +55,6 @@ export function decodeTopics(topics: string[], inputs: AbiInput[]): { [key: stri
 }
 
 export function decodeInputs(hexString: string, inputs: AbiInput[]) {
-  let decoded = ABICoder.decodeParameters(inputs, hexString);
-  return formatDecoded(decoded);
-}
-
-export function formatDecoded(element: { [key: string]: any }): unknown {
-  //if (!isNaN(element as any)) return Number(element);
-  if (element == null || typeof element != "object") return element;
-  let objectKeys = Object.keys(element);
-  if (Array.isArray(element) && objectKeys.every((key: any) => !isNaN(key))) return element.map((value: any) => formatDecoded(value));
-  let formatted: { [key: string]: any } = {};
-  objectKeys
-    .filter((key: any) => isNaN(key) && key != "__length__")
-    .forEach((key: any) => {
-      formatted[key] = formatDecoded(element[key]);
-    });
-  return formatted;
+  const decoded = ABICoder.decodeParameters(inputs, hexString);
+  return formatDecodedParameters(decoded, inputs);
 }
