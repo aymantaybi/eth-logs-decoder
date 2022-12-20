@@ -14,7 +14,7 @@ export function formatDecodedParameters(value: any, inputs: AbiInput[]) {
 
 export function formatDecodedParameter(value: any, input: AbiInput) {
   if (input.type.startsWith("uint") || input.type.startsWith("int")) {
-    return Number(value);
+    return value;
   } else if (input.type.startsWith("address")) {
     return toChecksumAddress(value);
   } else if (input.type.startsWith("tuple") && input.components) {
